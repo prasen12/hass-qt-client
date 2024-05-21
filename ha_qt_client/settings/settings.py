@@ -1,7 +1,7 @@
 '''
 MIT License
 
-Copyright (c) 2024 Oracle
+Copyright (c) 2024 Prasen Palvankar
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -21,52 +21,27 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-Created Date: Friday, Mar 22nd 2024, 11:15:10 pm
+Created Date: Thursday, May 16th 2024, 4:34:55 pm
 
 Author: Prasen Palvankar
 
 ----
-Date Modified: Sat Mar 23 2024
+Date Modified: Sun May 19 2024
 Modified By: Prasen Palvankar
 ----
 '''
 
+import json
+import os
+home_assistant_url = ''
+home_assistant_token = ''
+rooms_to_show = []
+with open(f'{os.path.dirname(__file__)}/settings.json') as f:
+    j:dict = json.load(f)
+    home_assistant_url = j['haUrl']
+    home_assistant_token = j['haToken']
+    if j.get('rooms'):
+        rooms_to_show = j.get('rooms')
+    
+    
 
-class Entity():
-    
-    def __init__(self, entityId:str, state:str=None, currentPosition:int=0, lastChanged:str=None, lastUpdated:str=None, friendlyName:str=None) -> None:
-        self.__entityId = entityId
-        self.__state = state
-        self.__lastUpdated = lastUpdated
-        self.__lastChanged = lastChanged
-        self.__friendlyName = friendlyName
-        self.__position = currentPosition
-    
-    @property
-    def entityId(self):
-        return self.__entityId.split('.')[1]
-    
-    @property
-    def state(self):
-        return self.__state
-    
-    @property
-    def lastChanged(self):
-        return self.__lastChanged
-    
-    @property
-    def group(self):
-        return self.__entityId.split('.')[0]
-    
-    @property
-    def name(self):
-        return self.__friendlyName
-    @property
-    def lastUpdated(self):
-        return self.__lastUpdated
-    
-    @property
-    def currentPosition(self):
-        return self.__position
-    
-    

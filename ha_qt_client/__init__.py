@@ -1,7 +1,7 @@
 '''
 MIT License
 
-Copyright (c) 2024 Oracle
+Copyright (c) 2024 Prasen Palvankar
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -21,20 +21,14 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-Created Date: Wednesday, Mar 20th 2024, 8:29:48 am
+Created Date: Saturday, Mar 30th 2024, 9:56:59 am
 
 Author: Prasen Palvankar
 
 ----
-Date Modified: Thu Mar 21 2024
+Date Modified: Sun May 19 2024
 Modified By: Prasen Palvankar
 ----
 '''
 
 
-from PyQt5 import QtWidgets
-from PyQt5.QtCore import Qt
-
-
-class MainLayout(QtWidgets.QFrame):
-        

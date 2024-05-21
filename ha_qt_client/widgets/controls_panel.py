@@ -1,7 +1,7 @@
 '''
 MIT License
 
-Copyright (c) 2024 Oracle
+Copyright (c) 2024 Prasen Palvankar
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -21,25 +21,39 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-Created Date: Tuesday, Mar 19th 2024, 10:05:54 pm
+Created Date: Saturday, Apr 13th 2024, 11:34:48 am
 
 Author: Prasen Palvankar
 
 ----
-Date Modified: Tue Mar 19 2024
+Date Modified: Sun May 19 2024
 Modified By: Prasen Palvankar
 ----
 '''
 
-from PyQt5 import QtWidgets
-from PyQt5.QtCore import Qt
-from main_panel_frame import Ui_MainPanel
 
-class MainPanel(QtWidgets.QFrame):
+from PyQt5 import uic, QtWidgets
+
+
+class ControlsPanel(QtWidgets.QFrame):
     
-    def __init__(self, parent: QtWidgets.QWidget) -> None:
+    def __init__(self, parent:QtWidgets.QWidget) -> None:
         super().__init__(parent)
-        self.ui = Ui_MainPanel()
-        self.ui.setupUi(parent)
-
+        self.__setupUi()
         
+    def __setupUi(self):
+        uic.loadUi('qtdesigns/controls_panel.ui', self)
+    
+    def setRoomName(self, name:str):
+        label = self.findChild(QtWidgets.QLabel, 'label_header_text')
+        if label:
+            label.setText(name)
+
+    def on_shades_button_clicked(self, fn):
+        button = self.findChild(QtWidgets.QPushButton, 'push_button_shades')
+        button.clicked.connect(fn)
+    
+    def on_rooms_button_clicked(self, fn):
+        button = self.findChild(QtWidgets.QPushButton, 'push_button_rooms')
+        button.clicked.connect(fn)
+    

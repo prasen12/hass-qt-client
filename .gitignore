@@ -1,14 +1,4 @@
 /.venv
-/blinds-horizontal.png
-/blinds-horizontal.svg
-/blinds-horizontal.svg.png
-/blinds_2.ui
-/blinds_2_ui.py
-/blinds_panel_frame_ui.py
-/main-panel.ui
-/main_panel_frame_ui.py
-/t1.py
-/test.ui
-/test_ui.py
-/test_window.py
-/x.py
+temp
+qtdesigns/*.py
+.DS_Store

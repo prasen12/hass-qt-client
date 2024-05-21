@@ -1,6 +1,6 @@
 {
     "haUrl": "ws://homeassistant.local:8123/api/websocket",
-    "haToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiIxZjFkZGNkYTIyMTA0NWZhYWNlMTZmMTE3N2Q5NWJmOCIsImlhdCI6MTcxNTkwMjk1OCwiZXhwIjoyMDMxMjYyOTU4fQ.b4Xie2Efv84juHftgAMT-qcUk0c2W9e7WL3BzS_Du84",
+    "haToken": "",
     "rooms": [
         "Living Room",
         "Family Room",

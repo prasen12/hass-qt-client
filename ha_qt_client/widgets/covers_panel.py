@@ -26,15 +26,14 @@ Created Date: Tuesday, Mar 19th 2024, 10:11:02 pm
 Author: Prasen Palvankar
 
 ----
-Date Modified: Sun May 19 2024
+Date Modified: Tue May 21 2024
 Modified By: Prasen Palvankar
 ----
 '''
 from collections.abc import Callable
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import pyqtSlot
-from ha_qt_client.temp.blinds_panel_frame import Ui_BlindsPanel
-from ha_qt_client.temp.cover_entity import CoverEntity
+from ha_qt_client.homeassistant_client.entities import CoverEntity
 from ha_qt_client.widgets.window_shade_widget import WindowShadeWidget
 from ha_qt_client.widgets.window_shades_panel import WindowShadesPanel
 

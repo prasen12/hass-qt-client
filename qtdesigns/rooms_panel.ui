@@ -43,11 +43,12 @@
       <property name="font">
        <font>
         <pointsize>16</pointsize>
+        <weight>75</weight>
         <bold>true</bold>
        </font>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(255, 113, 123);</string>
+       <string notr="true">background-color: rgb(35, 108, 255);</string>
       </property>
       <property name="text">
        <string>Rooms</string>
@@ -69,7 +70,7 @@
        <bool>false</bool>
       </property>
       <property name="styleSheet">
-       <string notr="true">background-color: rgb(239, 199, 255);</string>
+       <string notr="true">background-color: rgb(35, 108, 255);</string>
       </property>
       <widget class="QWidget" name="gridLayoutWidget">
        <property name="geometry">
@@ -99,11 +100,16 @@
            </sizepolicy>
           </property>
           <property name="font">
-           <font/>
+           <font>
+            <family>Arial</family>
+            <pointsize>20</pointsize>
+            <weight>50</weight>
+            <bold>false</bold>
+           </font>
           </property>
           <property name="styleSheet">
-           <string notr="true">background-color: rgb(170, 110, 255);
-color: rgb(234, 234, 234);</string>
+           <string notr="true">color: rgb(234, 234, 234);
+background-color: rgb(21, 40, 114);</string>
           </property>
           <property name="text">
            <string>PushButton</string>

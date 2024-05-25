@@ -26,7 +26,7 @@ Created Date: Thursday, Mar 21st 2024, 5:54:58 pm
 Author: Prasen Palvankar
 
 ----
-Date Modified: Sun May 19 2024
+Date Modified: Tue May 21 2024
 Modified By: Prasen Palvankar
 ----
 '''
@@ -121,6 +121,9 @@ class HomeAssistantWSClient(QObject):
             self.__ready = True
             # self.__send_message('subscribe_events', self.__handle_state_changed_event, {"event_type": "state_changed"})
             self.homeassistant_client_ready.emit()
+        elif message['type'] == 'auth_invalid':
+            print (f'Authorization invalid: {message["message"]}')
+            self.homeassistant_connection_error.emit(message['message'])
         elif message['type'] == 'result':
             if not message['success']:
                 print (f'Received Error from Homeassistant: {message["error"]}')

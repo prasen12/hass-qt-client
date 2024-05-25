@@ -26,18 +26,21 @@ Created Date: Tuesday, Mar 26th 2024, 3:18:46 pm
 Author: Prasen Palvankar
 
 ----
-Date Modified: Sun May 19 2024
+Date Modified: Tue May 21 2024
 Modified By: Prasen Palvankar
 ----
 '''
 
 import sys
 from PyQt5 import QtWidgets
+from PyQt5.QtCore import Qt
 from ha_qt_client import main_app
 
 
 qt_app = QtWidgets.QApplication(sys.argv)
 app = main_app.HomeassistantQTClient()
-app.show()
+app.setWindowTitle(None)
+app.setWindowFlags(Qt.WindowType.FramelessWindowHint)
+app.showMaximized()
 qt_app.exec()
 

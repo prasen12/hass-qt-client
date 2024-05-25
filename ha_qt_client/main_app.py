@@ -26,7 +26,7 @@ Created Date: Saturday, Mar 30th 2024, 10:26:41 am
 Author: Prasen Palvankar
 
 ----
-Date Modified: Sun May 19 2024
+Date Modified: Tue May 21 2024
 Modified By: Prasen Palvankar
 ----
 '''
@@ -73,6 +73,7 @@ class HomeassistantQTClient(QtWidgets.QMainWindow):
         self.__devices_manager.devices_updated.connect(lambda : self.__set_initial_load_status('devices', True))
         self.__entities_manager = EntitiesManager(['cover'])
         self.__entities_manager.entities_updated.connect(lambda : self.__set_initial_load_status('entities', True))
+        #TODO: Handle authentication failure
         self.__cover_panels:dict[str, covers_panel.CoversPanel] = dict()
         self.state_changed.connect(self.__change_state_to)
 

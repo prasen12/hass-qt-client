@@ -21,58 +21,24 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-Created Date: Sunday, Apr 7th 2024, 5:32:54 pm
+Created Date: Sunday, Jun 2nd 2024, 5:23:15 pm
 
 Author: Prasen Palvankar
 
 ----
-Date Modified: Mon May 20 2024
+Date Modified: Sun Jun 02 2024
 Modified By: Prasen Palvankar
 ----
 '''
 
-
 from typing import Type
 from PyQt5.QtCore import QObject, pyqtSignal
+from ha_qt_client.homeassistant_client.entities.cover_entity import CoverEntity
+from ha_qt_client.homeassistant_client.entities.light_entity import LightEntity
 from ha_qt_client.homeassistant_client.entity import Entity
 from ha_qt_client.homeassistant_client.websocket_client import HomeAssistantWSClient
 from ha_qt_client.homeassistant_client.entity import Entity
 from PyQt5.QtCore import  pyqtSignal
-
-
-class CoverEntity(Entity):
-    open_position_updated = pyqtSignal(str, int)
-    slider_position_changed = pyqtSignal(str, int)
-    
-    def __init__(self, **kwargs) -> None:
-        super().__init__(**kwargs)
-        self.__open__position = None
-    
-    def set_state(self, state: any):
-        super().set_state(state)
-        curr_pos =  (self.state.get('attributes')).get('current_position')
-        if curr_pos:
-            self.__set_current_cover_position(curr_pos)
-    
-    @property
-    def open_position(self):
-        return self.__open__position
-     
-    def __set_current_cover_position(self, position: int):
-        if position != self.__open__position:
-            self.__open__position = position
-            self.open_position_updated.emit(self.entity_id, position)
-            
-    def set_current_slider_position(self, position:int):
-        if position != self.__open__position:
-            self.__open__position = position
-            self.homeassistant_client.set_cover_position(self.entity_id, position)
-
-
-class LightEntity(Entity):
-   def __init__(self, **kwargs) -> None:
-       super().__init__(**kwargs)
-
 
 class EntitiesManager(QObject):
     entities_updated = pyqtSignal()
@@ -97,7 +63,8 @@ class EntitiesManager(QObject):
             if entity_class is not None:
                 ec = entity_class(**e)                
                 # new_entity = Entity(**e)   
-                self.__entities[ec.entity_id] = ec         
+                self.__entities[ec.entity_id] = ec    
+                # Add state change handler
         # Object for Entities we are interested are now created. Get the current states
         self.__hass_client.get_states()
         self.entities_updated.emit()
@@ -117,6 +84,7 @@ class EntitiesManager(QObject):
     def __on_state_changed(self, entity_id:str, eventData:dict):
         e = self.get_entity(entity_id)
         if e is not None:
+            print(f'Entity {e.name} state changed to {eventData["new_state"]}')
             e.set_state(eventData['new_state'])
 
 

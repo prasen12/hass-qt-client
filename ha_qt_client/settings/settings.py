@@ -26,7 +26,7 @@ Created Date: Thursday, May 16th 2024, 4:34:55 pm
 Author: Prasen Palvankar
 
 ----
-Date Modified: Sun May 19 2024
+Date Modified: Fri May 24 2024
 Modified By: Prasen Palvankar
 ----
 '''
@@ -36,7 +36,7 @@ import os
 home_assistant_url = ''
 home_assistant_token = ''
 rooms_to_show = []
-with open(f'{os.path.dirname(__file__)}/settings.json') as f:
+with open('settings.json') as f:
     j:dict = json.load(f)
     home_assistant_url = j['haUrl']
     home_assistant_token = j['haToken']

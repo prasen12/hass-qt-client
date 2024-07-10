@@ -26,7 +26,7 @@ Created Date: Saturday, Mar 30th 2024, 10:26:41 am
 Author: Prasen Palvankar
 
 ----
-Date Modified: Tue May 21 2024
+Date Modified: Sun Jun 02 2024
 Modified By: Prasen Palvankar
 ----
 '''
@@ -36,8 +36,10 @@ from PyQt5 import QtWidgets
 from PyQt5.QtCore import pyqtSlot, pyqtSignal
 from ha_qt_client.homeassistant_client.areas import AreasManager, Area
 from ha_qt_client.homeassistant_client.devices import DevicesManager
-from ha_qt_client.homeassistant_client.entities import EntitiesManager, CoverEntity
-from ha_qt_client.widgets import covers_panel, controls_panel, rooms_panel
+# from ha_qt_client.homeassistant_client.entities import EntitiesManager, CoverEntity, LightEntity
+from ha_qt_client.homeassistant_client.entities_manager import EntitiesManager
+from ha_qt_client.homeassistant_client import entities
+from ha_qt_client.widgets import covers_panel, controls_panel, rooms_panel, lights_panel
 from ha_qt_client.homeassistant_client.websocket_client import HomeAssistantWSClient
 from ha_qt_client.settings import settings
 
@@ -46,7 +48,7 @@ STATE_COVERS_SELECTED = 'covers_selected'
 STATE_SELECT_ENTITY_GROUP = 'select_entity_group'
 STATE_SELECT_ROOMS = 'select_rooms'
 STATE_ROOM_SELECTED = 'room_selected'
-
+STATE_LIGHTS_SELECTED = 'lights_selected'
 
 class HomeassistantQTClient(QtWidgets.QMainWindow):
     state_changed = pyqtSignal(str)
@@ -57,7 +59,8 @@ class HomeassistantQTClient(QtWidgets.QMainWindow):
         
         self.__ha_ws_client = HomeAssistantWSClient.get_instance()
         self.__ha_ws_client.homeassistant_client_ready.connect(self.__handle_ha_client_ready)
-        self.__ha_ws_client.homeassistant_connection_error.connect(self.__handle_ha_connection_error)
+        self.__ha_ws_client.homeassistant_error_message.connect(self.__handle_ha_error_message)
+        self.__ha_ws_client.homeassistant_info_message.connect(self.__handle_ha_info_message)
         self.__set_statusbar_text(f'Connecting to {settings.home_assistant_url}')
         self.__ha_ws_client.connect(settings.home_assistant_url, settings.home_assistant_token)
     
@@ -75,6 +78,7 @@ class HomeassistantQTClient(QtWidgets.QMainWindow):
         self.__entities_manager.entities_updated.connect(lambda : self.__set_initial_load_status('entities', True))
         #TODO: Handle authentication failure
         self.__cover_panels:dict[str, covers_panel.CoversPanel] = dict()
+        self.__lights_panels:dict[str, lights_panel.LightsPanel] = dict()
         self.state_changed.connect(self.__change_state_to)
 
     def __setupMainWindow(self):
@@ -111,12 +115,14 @@ class HomeassistantQTClient(QtWidgets.QMainWindow):
             self.__stacked_layout.setCurrentWidget(self.__rooms_panel)
         elif new_state == STATE_ROOM_SELECTED:
             area_name = self.__areas_manager.get_area(self.__current_room_id).name
-            self.__main_panel.setRoomName(area_name)
-            self.__stacked_layout.setCurrentWidget(self.__main_panel)  
+            self.__controls_panel.setRoomName(area_name)
+            self.__stacked_layout.setCurrentWidget(self.__controls_panel)  
+        elif new_state == STATE_LIGHTS_SELECTED:
+            self.__stacked_layout.setCurrentWidget(self.__get_lights_panel())
         elif new_state == STATE_COVERS_SELECTED:
             self.__stacked_layout.setCurrentWidget(self.__get_covers_panel())
         elif new_state == STATE_SELECT_ENTITY_GROUP:
-            self.__stacked_layout.setCurrentWidget(self.__main_panel)
+            self.__stacked_layout.setCurrentWidget(self.__controls_panel)
         elif new_state == STATE_SELECT_ROOMS:
             self.__stacked_layout.setCurrentWidget(self.__rooms_panel)
             
@@ -130,7 +136,7 @@ class HomeassistantQTClient(QtWidgets.QMainWindow):
         self.__rooms_panel.room_selected.connect(self.__handle_room_selected)
        
     def __update_entities_room(self):
-        cover_entities:list[CoverEntity] = self.__entities_manager.get_entities()
+        cover_entities:list[entities.CoverEntity] = self.__entities_manager.get_entities()
         for ce in cover_entities:
             device = self.__devices_manager.get_device(ce.device_id)
             if device is not None:
@@ -141,19 +147,24 @@ class HomeassistantQTClient(QtWidgets.QMainWindow):
         self.__statusbar.clearMessage()
         self.__set_statusbar_text('Connected. Requesting configuration from Home Assitant...')
         self.__stacked_layout = QtWidgets.QStackedLayout()
-        self.__main_panel = controls_panel.ControlsPanel(self)
-        self.__main_panel.on_rooms_button_clicked(lambda x: self.__change_state_to(STATE_SELECT_ROOMS))
-        self.__main_panel.on_shades_button_clicked(lambda x: self.__change_state_to(STATE_COVERS_SELECTED))
-        self.__stacked_layout.addWidget(self.__main_panel)
+        self.__controls_panel = controls_panel.ControlsPanel(self)
+        self.__controls_panel.on_rooms_button_clicked(lambda x: self.__change_state_to(STATE_SELECT_ROOMS))
+        self.__controls_panel.on_shades_button_clicked(lambda x: self.__change_state_to(STATE_COVERS_SELECTED))
+        self.__controls_panel.on_lights_button_clicked(lambda x: self.__change_state_to(STATE_LIGHTS_SELECTED))
+        self.__stacked_layout.addWidget(self.__controls_panel)
         self.__ha_ws_client.request_areas()
         self.__ha_ws_client.request_devices()
         self.__ha_ws_client.request_entities()
 
 
     @pyqtSlot(str)
-    def __handle_ha_connection_error(self, data:any):
-        self.__set_statusbar_text(f'Connection to {settings.home_assistant_url} failed. Error: {data}')
-    
+    def __handle_ha_error_message(self, data:any):
+        self.__set_statusbar_text(f'An error occured - {data}')
+
+    @pyqtSlot(str)    
+    def __handle_ha_info_message(self, data:any):
+        self.__set_statusbar_text(f'Info -  {data}')
+        
     @pyqtSlot(str)
     def __handle_room_selected(self, room_id:str):
         self.__current_room_id = room_id
@@ -164,9 +175,21 @@ class HomeassistantQTClient(QtWidgets.QMainWindow):
         
         cp = self.__cover_panels.get(self.__current_room_id)
         if not cp:
-            cover_entities:list[CoverEntity] = self.__entities_manager.get_entities(group='cover', area_id=self.__current_room_id)
+            cover_entities:list[entities.CoverEntity] = self.__entities_manager.get_entities(group='cover', area_id=self.__current_room_id)
             cp = covers_panel.CoversPanel(self, room_name=(self.__areas_manager.get_area(self.__current_room_id)).name)
             self.__stacked_layout.addWidget(cp)
             cp.on_back_button_clicked(lambda x: self.__change_state_to(STATE_SELECT_ENTITY_GROUP))
             cp.add_cover_entities(cover_entities)
         return cp
+
+    @pyqtSlot(list)
+    def __get_lights_panel(self):
+        lp = self.__lights_panels.get(self.__current_room_id)
+        if not lp:
+            light_entities:list[entities.LightEntity] = self.__entities_manager.get_entities(group='light', 
+                                                                                    area_id=self.__current_room_id)
+            lp = lights_panel.LightsPanel(self, room_name=(self.__areas_manager.get_area(self.__current_room_id)).name)
+            self.__stacked_layout.addWidget(lp)
+            lp.on_back_button_clicked(lambda x: self.__change_state_to(STATE_SELECT_ENTITY_GROUP))
+            lp.add_light_entities(light_entities)
+        return lp

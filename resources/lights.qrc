@@ -1,0 +1,6 @@
+<RCC>
+  <qresource prefix="images">
+    <file>light-bulb-off.png</file>
+    <file>light-bulb-on.png</file>
+  </qresource>
+</RCC>

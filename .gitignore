@@ -3,3 +3,4 @@ temp
 qtdesigns/*.py
 .DS_Store
 __pycache__
+settings.json

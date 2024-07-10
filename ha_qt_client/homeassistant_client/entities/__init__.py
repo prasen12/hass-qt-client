@@ -21,42 +21,14 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-Created Date: Saturday, Apr 13th 2024, 11:34:48 am
+Created Date: Sunday, Jun 2nd 2024, 5:22:28 pm
 
 Author: Prasen Palvankar
 
 ----
-Date Modified: Mon May 27 2024
+Date Modified: Sun Jun 02 2024
 Modified By: Prasen Palvankar
 ----
 '''
 
 
-from PyQt5 import uic, QtWidgets
-
-
-class ControlsPanel(QtWidgets.QFrame):
-    
-    def __init__(self, parent:QtWidgets.QWidget) -> None:
-        super().__init__(parent)
-        self.__setupUi()
-        
-    def __setupUi(self):
-        uic.loadUi('qtdesigns/controls_panel.ui', self)
-    
-    def setRoomName(self, name:str):
-        label = self.findChild(QtWidgets.QLabel, 'label_header_text')
-        if label:
-            label.setText(name)
-
-    def on_shades_button_clicked(self, fn):
-        button = self.findChild(QtWidgets.QPushButton, 'push_button_shades')
-        button.clicked.connect(fn)
-    
-    def on_rooms_button_clicked(self, fn):
-        button = self.findChild(QtWidgets.QPushButton, 'push_button_rooms')
-        button.clicked.connect(fn)
-    
-    def on_lights_button_clicked(self, fn):
-        button = self.findChild(QtWidgets.QPushButton, 'push_button_lights')
-        button.clicked.connect(fn)

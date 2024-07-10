@@ -26,7 +26,7 @@ Created Date: Thursday, Mar 21st 2024, 5:54:58 pm
 Author: Prasen Palvankar
 
 ----
-Date Modified: Tue May 21 2024
+Date Modified: Sun Jun 02 2024
 Modified By: Prasen Palvankar
 ----
 '''
@@ -45,6 +45,8 @@ class HomeAssistantWSClient(QObject):
     device_list_received = pyqtSignal(list)
     homeassistant_client_ready = pyqtSignal()
     homeassistant_connection_error = pyqtSignal(str)
+    homeassistant_error_message = pyqtSignal(str)
+    homeassistant_info_message = pyqtSignal(str)
     
     @classmethod
     def get_instance(cls):
@@ -119,14 +121,15 @@ class HomeAssistantWSClient(QObject):
             self.__wsclient.sendTextMessage(json.dumps({"type": "auth", "access_token": self.__token}))
         elif message['type'] == 'auth_ok':
             self.__ready = True
-            # self.__send_message('subscribe_events', self.__handle_state_changed_event, {"event_type": "state_changed"})
+            self.__send_message('subscribe_events', self.__handle_state_changed_event, {"event_type": "state_changed"})
             self.homeassistant_client_ready.emit()
         elif message['type'] == 'auth_invalid':
             print (f'Authorization invalid: {message["message"]}')
-            self.homeassistant_connection_error.emit(message['message'])
+            self.homeassistant_error_message.emit(message['message'])
         elif message['type'] == 'result':
             if not message['success']:
                 print (f'Received Error from Homeassistant: {message["error"]}')
+                self.homeassistant_error_message.emit(message['message'])
             else:
                 pr = self.__pendingRequests[message['id']]
                 cb = pr.get('callback')
@@ -148,9 +151,9 @@ class HomeAssistantWSClient(QObject):
     def get_states(self):
         self.__send_message('get_states', self.__handle_get_states_response)
     
-    def register_state_trigger_listener(self, entity_id: str, fromState:str, toState:str, listener):
-        self.__stateChangeListeners[entity_id] = listener
-        self.__send_message('subscribe_trigger', self.__handle_subscribe_trigger_response, {"trigger": {"platform": "state", "entity_id":  entity_id, "from": fromState, "to": toState}})
+    # def register_state_trigger_listener(self, entity_id: str, fromState:str, toState:str, listener):
+    #     self.__stateChangeListeners[entity_id] = listener
+    #     self.__send_message('subscribe_trigger', self.__handle_subscribe_trigger_response, {"trigger": {"platform": "state", "entity_id":  entity_id, "from": fromState, "to": toState}})
     
     def request_entities(self):
         # self.__send_message('get_states', self.__handle_get_entities_response)
@@ -174,6 +177,19 @@ class HomeAssistantWSClient(QObject):
             }
         }
         self.__send_message('call_service', self.__handle_service_response, serviceRequest)
+    
+    def set_light_state(self, entity_id:str, state:str):
+        serviceRequest = {
+            "type": "call_service",
+            "domain": "light",
+            "service": "turn_on" if state == 'on' else "turn_off",
+            "return_response": False,
+            "service_data": {
+                "entity_id": entity_id
+            }
+        }
+        self.__send_message('call_service', self.__handle_service_response, serviceRequest)
+        
     def connect(self, haUrl:str, token:str):
         self.__messageId = 0
         self.__wsclient = QtWebSockets.QWebSocket()

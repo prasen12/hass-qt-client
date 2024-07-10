@@ -21,42 +21,38 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-Created Date: Saturday, Apr 13th 2024, 11:34:48 am
+Created Date: Sunday, Jun 2nd 2024, 5:22:52 pm
 
 Author: Prasen Palvankar
 
 ----
-Date Modified: Mon May 27 2024
+Date Modified: Sun Jun 02 2024
 Modified By: Prasen Palvankar
 ----
 '''
 
 
-from PyQt5 import uic, QtWidgets
+from ha_qt_client.homeassistant_client.entity import Entity
+from PyQt5.QtCore import  pyqtSignal
 
 
-class ControlsPanel(QtWidgets.QFrame):
-    
-    def __init__(self, parent:QtWidgets.QWidget) -> None:
-        super().__init__(parent)
-        self.__setupUi()
-        
-    def __setupUi(self):
-        uic.loadUi('qtdesigns/controls_panel.ui', self)
-    
-    def setRoomName(self, name:str):
-        label = self.findChild(QtWidgets.QLabel, 'label_header_text')
-        if label:
-            label.setText(name)
+class LightEntity(Entity):
+   light_entity_state_changed = pyqtSignal(str, str)
 
-    def on_shades_button_clicked(self, fn):
-        button = self.findChild(QtWidgets.QPushButton, 'push_button_shades')
-        button.clicked.connect(fn)
-    
-    def on_rooms_button_clicked(self, fn):
-        button = self.findChild(QtWidgets.QPushButton, 'push_button_rooms')
-        button.clicked.connect(fn)
-    
-    def on_lights_button_clicked(self, fn):
-        button = self.findChild(QtWidgets.QPushButton, 'push_button_lights')
-        button.clicked.connect(fn)
+   def __init__(self, **kwargs) -> None:
+       super().__init__(**kwargs)
+       self.__switch_state = 'off'
+
+   def set_state(self, state:str):
+       super().set_state(state)
+       self.__switch_state = self.state.get('state')
+       self.light_entity_state_changed.emit(self.entity_id, self.__switch_state)
+
+   @property
+   def light_entity_state(self):
+       return self.__switch_state
+   
+   @light_entity_state.setter
+   def light_entity_state(self, state:str):
+       self.__switch_state = state
+       self.homeassistant_client.set_light_state(self.entity_id, state)
